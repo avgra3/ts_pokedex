@@ -13,3 +13,7 @@ This project was implemented using TypeScript and Node.
 ## Running
 
 To run, use the [Makefile](./Makefile), running `make help` to see commands.
+
+## Credits
+
+This project outline comes from [Boot.dev](boot.dev).
