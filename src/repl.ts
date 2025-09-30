@@ -6,7 +6,13 @@
 import { type State } from "./state.js";
 
 export function cleanInput(input: string): string[] {
-	const words = removeWhitespace(input.toLowerCase().split(" "));
+	const words = removeWhitespace(input.toLowerCase().split(/\s+/));
+	const noEmpty = [];
+	words.forEach((word: string) => {
+		if (word.trim() !== "") {
+			noEmpty.push(word.trim());
+		}
+	});
 	return words;
 }
 
@@ -14,7 +20,7 @@ function removeWhitespace(input: string[]): string[] {
 	const cleaned: string[] = [];
 	for (const word of input) {
 		if (word.trim() !== "") {
-			cleaned.push(word);
+			cleaned.push(word.trim());
 		}
 	}
 	return cleaned;
