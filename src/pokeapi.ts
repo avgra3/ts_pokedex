@@ -1,8 +1,12 @@
+import { Cache, CacheEntry } from "./pokecache.js";
 
 export class PokeAPI {
-	private static readonly baseURL: string = "https://pokeapi.co/docs/v2";
-
-	constructor() { }
+	private static readonly baseURL: string = "https://pokeapi.co/api/v2"; //"https://pokeapi.co/docs/v2";
+	private cache: Cache;
+	constructor() {
+		// Set interval to number * 1000 (seconds)
+		this.cache = new Cache(5 * 1000);
+	}
 	async fetchLocations(pageURL?: string): Promise<ShallowLocations> {
 		let locationURL = "";
 		if (typeof pageURL === "undefined") {
@@ -10,12 +14,22 @@ export class PokeAPI {
 		} else {
 			locationURL = pageURL;
 		}
+		// First check the cache!
+		// Check by url
+		if (typeof this.cache.get(locationURL) !== "undefined") {
+			const location = this.cache.get(locationURL);
+			if (typeof location !== "undefined" && typeof location.val !== "undefined") {
+				return location.val as ShallowLocations;
+			}
+		}
 		try {
 			const response = await fetch(locationURL);
 			if (!response.ok) {
 				throw new Error(`Response status: ${response.status}`);
 			}
 			const shallowLocations = await response.json() as ShallowLocations;
+			const cacheEntry: CacheEntry<any> = { createdAt: Date.now(), val: shallowLocations };
+			this.cache.add(locationURL, cacheEntry);
 			return shallowLocations;
 		}
 		catch (error) {
@@ -24,14 +38,31 @@ export class PokeAPI {
 		}
 	}
 
-	async fetchLocation(locationName: string): Promise<Location> {
+	async fetchLocation(locationName: string): Promise<LocationArea> {
+		if (locationName.trim().length === 0) {
+			throw new Error("No location name provided!");
+		}
 		const locationURL = `${PokeAPI.baseURL}/location-area/${locationName}`;
+		// TODO: https://pokeapi.co/api/v2/location-area/
+		// First check the cache!
+		// Check by url
+		if (typeof this.cache.get(locationURL) !== "undefined") {
+			const location = this.cache.get(locationURL);
+			if (typeof location !== "undefined" && typeof location.val !== "undefined") {
+				return location.val as LocationArea;
+			}
+		}
 		try {
 			const response = await fetch(locationURL);
 			if (!response.ok) {
 				throw new Error(`Response status: ${response.status}`);
 			}
-			const result = await response.json() as Location;
+			const result = await response.json() as LocationArea;
+			if (typeof result === "undefined") {
+				throw new Error("Nothing returned!");
+			}
+			const cacheEntry = { createdAt: Date.now(), val: result };
+			this.cache.add(locationURL, cacheEntry);
 			return result;
 
 		}
@@ -47,15 +78,15 @@ export type ShallowLocations = {
 };
 
 export type Location = { count: number; next: string; previous?: string; results: { name: string; url: string; }[] };
-type LocationArea = {
-	id: number; name: string; gameIndex: number;
-	encounterMethodRates: EncounterMethodRate[]; location: Location;
-	names: Name[]; pokemonEncounters: PokemonEncounter[];
+export type LocationArea = {
+	id: number; name: string; game_index: number;
+	encounter_method_rates: EncounterMethodRate[]; location: Location;
+	names: Name[]; pokemon_encounters: PokemonEncounter[];
 };
 type EncounterMethodRate = { encounterMethod: EncounterMethod; versionDetails: EncounterVersionDetails[]; };
 type EncounterVersionDetails = { rate: number; version: Version; };
-type PokemonEncounter = { pokemon: Pokemon; versionDetails: VersionEncounterDetail[]; };
-type VersionEncounterDetail = { version: Version; maxChance: number; encounterDetails: Encounter[]; };
+type PokemonEncounter = { pokemon: Pokemon; version_details: VersionEncounterDetail[]; };
+type VersionEncounterDetail = { version: Version; max_chance: number; encounter_details: Encounter[]; };
 type Encounter = { minLevel: number; maxLevel: number; conditionValues: EncounterConditionValue[]; chance: number; method: EncounterMethod; };
 type EncounterConditionValue = { id: number; name: string; condition: EncounterCondition; };
 type EncounterCondition = { id: number; name: string; names: Name[]; values: EncounterConditionValue[]; };
