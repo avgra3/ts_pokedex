@@ -7,6 +7,7 @@ export class PokeAPI {
 		// Set interval to number * 1000 (seconds)
 		this.cache = new Cache(5 * 1000);
 	}
+
 	async fetchLocations(pageURL?: string): Promise<ShallowLocations> {
 		let locationURL = "";
 		if (typeof pageURL === "undefined") {
@@ -38,12 +39,41 @@ export class PokeAPI {
 		}
 	}
 
+	async fetchPokemon(pokemonName: string): Promise<Pokemon> {
+		const pokemonURL = `${PokeAPI.baseURL}/pokemon/${pokemonName}`;
+		// First check the cache!
+		// Check by url
+		if (typeof this.cache.get(pokemonURL) !== "undefined") {
+			const pokemon = this.cache.get(pokemonURL);
+			if (typeof pokemon !== "undefined" && typeof pokemon.val !== "undefined") {
+				return pokemon.val as Pokemon;
+			}
+		}
+		try {
+			const response = await fetch(pokemonURL);
+			if (!response.ok) {
+				throw new Error(`Response status: ${response.status}`);
+			}
+			const result = await response.json() as Pokemon;
+			if (typeof result === "undefined") {
+				throw new Error("Nothing returned!");
+			}
+			const cacheEntry = { createdAt: Date.now(), val: result };
+			this.cache.add(pokemonURL, cacheEntry);
+			return result;
+
+		}
+		catch (error) {
+			console.error(`Error fetching data: ${error}`);
+			throw error;
+		}
+	}
+
 	async fetchLocation(locationName: string): Promise<LocationArea> {
 		if (locationName.trim().length === 0) {
 			throw new Error("No location name provided!");
 		}
 		const locationURL = `${PokeAPI.baseURL}/location-area/${locationName}`;
-		// TODO: https://pokeapi.co/api/v2/location-area/
 		// First check the cache!
 		// Check by url
 		if (typeof this.cache.get(locationURL) !== "undefined") {
@@ -143,7 +173,7 @@ type PalParkEncounterArea = { baseScore: number; rate: number; area: PalParkArea
 type PalParkArea = { id: number; name: string; names: Name[]; pokemonEncounters: PalParkEncounterSpecies[]; };
 type PalParkEncounterSpecies = { baseScore: number; rate: number; pokemonSpecies: PokemonSpecies; };
 type PokemonSpeciesVariety = { isDefault: boolean; pokemon: Pokemon };
-type Pokemon = { id: number; name: string; baseExperience: number; height: number; isDefault: boolean; order: number; weight: number; abilities: PokemonAbility[]; forms: PokemonForm[]; gameIndicies: VersionGameIndex[]; heldItems: PokemonHeldItem[]; locationAreaEncounters: string; moves: PokemonMove[]; pastTypes: PokemonTypePast[]; pastAbilities: PokemonAbilityPast; sprites: PokemonSprites; cries: PokemonCries; stats: PokemonStat[]; types: PokemonType[]; }
+export type Pokemon = { id: number; name: string; base_experience: number; height: number; is_default: boolean; order: number; weight: number; abilities: PokemonAbility[]; forms: PokemonForm[]; game_indicies: VersionGameIndex[]; held_items: PokemonHeldItem[]; location_area_encounters: string; moves: PokemonMove[]; past_types: PokemonTypePast[]; past_abilities: PokemonAbilityPast; sprites: PokemonSprites; cries: PokemonCries; stats: PokemonStat[]; types: PokemonType[]; }
 type PokemonForm = {
 	id: number; name: string; order: number; formOrder: number;
 	isDefault: boolean; isBattleOnly: boolean; isMega: boolean;
