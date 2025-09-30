@@ -34,7 +34,6 @@ export class PokeAPI {
 			return shallowLocations;
 		}
 		catch (error) {
-			console.error(`Error fetching data: ${error}`);
 			throw error;
 		}
 	}
@@ -64,7 +63,6 @@ export class PokeAPI {
 
 		}
 		catch (error) {
-			console.error(`Error fetching data: ${error}`);
 			throw error;
 		}
 	}
@@ -97,7 +95,6 @@ export class PokeAPI {
 
 		}
 		catch (error) {
-			console.error(`Error fetching data: ${error}`);
 			throw error;
 		}
 	}
@@ -200,12 +197,12 @@ type PokemonSprites = {
 	backFemale: string; backShinyFemale: string;
 };
 type PokemonCries = { latest: string; legacy: string; };
-type PokemonStat = { stat: Stat; effort: number; baseStat: number; };
-type PokemonType = { slot: number; type_: Type; };
-type Type = {
-	id: number; name: string; damageRelations: TypeRelations;
-	pastDamageRelations: Type[]; gameIndicies: GenerationGameIndex[];
-	generation: Generation; moveDamageClass: MoveDamageClass;
+export type PokemonStat = { stat: Stat; effort: number; base_stat: number; };
+export type PokemonType = { slot: number; type: Type; };
+export type Type = {
+	id: number; name: string; damage_relations: TypeRelations;
+	past_damage_relations: Type[]; game_indicies: GenerationGameIndex[];
+	generation: Generation; move_damage_class: MoveDamageClass;
 	names: Name[]; pokemon: TypePokemon[]; moves: Move[];
 }
 type TypeRelations = {

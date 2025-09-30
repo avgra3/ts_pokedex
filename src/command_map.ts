@@ -15,7 +15,7 @@ export async function commandMap(state: State): Promise<void> {
 		}
 		console.log(message);
 	} catch (error) {
-		throw error;
+		console.log(`Error: ${error}`);
 	}
 }
 

@@ -1,6 +1,7 @@
 import { type State } from "./state.js";
 
 export async function commandExplore(state: State, ...location: string[]): Promise<void> {
+	// Check cache first:
 	try {
 		// LocationArea
 		const locationArea = await state.pokeAPI.fetchLocation(location.join(" "));
@@ -10,6 +11,6 @@ export async function commandExplore(state: State, ...location: string[]): Promi
 		}
 
 	} catch (error) {
-		throw error;
+		console.log(`Error => ${error}`);
 	}
 };

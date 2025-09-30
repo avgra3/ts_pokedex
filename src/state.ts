@@ -3,7 +3,7 @@ import { commandExit } from "./command_exit.js";
 import { commandHelp } from "./command_help.js";
 import { commandMap, commandMapB } from "./command_map.js";
 import { commandExplore } from "./command_explore.js"
-
+import { commandInspect } from "./command_inspect.js"
 import { PokeAPI, Pokemon } from "./pokeapi.js";
 import { commandCatch } from "./command_catch.js";
 
@@ -60,6 +60,11 @@ export function initState() {
 			name: "catch",
 			description: "Catch a pokemon",
 			callback: commandCatch,
+		},
+		inspect: {
+			name: "inspect",
+			description: "Inspect a pokemon by name",
+			callback: commandInspect,
 		},
 		// We can add more commands here
 	};

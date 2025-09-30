@@ -2,6 +2,10 @@ import { type State } from "./state.js";
 
 export async function commandCatch(state: State, pokemon: string): Promise<void> {
 	try {
+		if (typeof pokemon === "undefined") {
+			console.log("No pokemon provided. Try again.");
+			return
+		}
 		// Try to catch a Pokemon
 		console.log(`Throwing a Pokeball at ${pokemon}...`);
 		const pokemonWanted = await state.pokeAPI.fetchPokemon(pokemon);
@@ -13,7 +17,7 @@ export async function commandCatch(state: State, pokemon: string): Promise<void>
 			console.log(`${pokemon} escaped!`);
 		}
 	} catch (error) {
-		throw error;
+		console.log(`Error: ${error}`);
 	}
 
 };
