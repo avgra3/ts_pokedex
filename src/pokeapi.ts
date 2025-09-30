@@ -1,11 +1,11 @@
 import { Cache, CacheEntry } from "./pokecache.js";
 
 export class PokeAPI {
-	private static readonly baseURL: string = "https://pokeapi.co/api/v2"; //"https://pokeapi.co/docs/v2";
+	private static readonly baseURL: string = "https://pokeapi.co/api/v2";
 	private cache: Cache;
 	constructor() {
 		// Set interval to number * 1000 (seconds)
-		this.cache = new Cache(5 * 1000);
+		this.cache = new Cache(10 * 1000);
 	}
 
 	async fetchLocations(pageURL?: string): Promise<ShallowLocations> {

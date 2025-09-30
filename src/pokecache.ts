@@ -27,7 +27,7 @@ export class Cache {
 		// Delete entries older than the interval:
 		const interval = Date.now() - this.#interval;
 		this.#cache.forEach((value: CacheEntry<any>, key: string) => {
-			if (value.createdAt < interval) {
+			if (value.createdAt <= interval) {
 				this.#cache.delete(key);
 			}
 		});
